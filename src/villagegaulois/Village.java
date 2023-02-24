@@ -8,10 +8,12 @@ public class Village {
 	private Chef chef;
 	private Gaulois[] villageois;
 	private int nbVillageois = 0;
+	private static Marche marche;
 
-	public Village(String nom, int nbVillageoisMaximum) {
+	public Village(String nom, int nbVillageoisMaximum, int nbEtals) {
 		this.nom = nom;
 		villageois = new Gaulois[nbVillageoisMaximum];
+		this.marche = new Marche(nbEtals);
 	}
 
 	public String getNom() {
@@ -99,16 +101,39 @@ public class Village {
 			return null;
 		}
 		private String afficherMache() {
+			String affichageMarche = "";
 			int nbEtalVide = 0; 
 			for (int indiceEtals = 0; indiceEtals < etals.length ;indiceEtals ++) {
-				if(etals[indiceEtals].isEtalOccupe() == false) {
-					nbEtalVide += 1;
+				if(etals[indiceEtals].isEtalOccupe()) {
+					affichageMarche += etals[indiceEtals].afficherEtal();
 				return etals[indiceEtals].afficherEtal();
 				}
 			}
-			return "Il reste" + nbEtalVide + " etals non utilises dans le marche.\n";
+			return affichageMarche + "Il reste" + nbEtalVide + " etals non utilises dans le marche.\n";
 		}
 		
-		
+	public String installerVendeur(Gaulois vendeur, String produit, int nbProduit) {
+		StringBuilder chaine = new StringBuilder();
+		chaine.append(vendeur.getNom()+" cherche un nedroit pour vendre "+nbProduit+""+produit +".\n");
+		int indiceEtalLibre = marche.trouverEtalLibre();
+		if (indiceEtalLibre == -1) {
+			chaine.append("Le vendeur "+vendeur.getNom()+" n'a pas d'étals pour s'installer.\n");
+		}else {
+			marche.utiliserEtal(indiceEtalLibre, vendeur, produit, nbProduit);
+			chaine.append("Le vendeur "+vendeur.getNom()+" vend des "+produit+" à l'etal numero "+(indiceEtalLibre + 1)+".\n");
 		}
-}
+		return chaine.toString();
+		}
+	
+	public String rechercherVendeurProduit (String produit) {
+		StringBuilder chaine = new StringBuilder();
+		Etal[] etalsAvecProduit = marche.trouverEtals(produit);
+		if (etalsAvecProduit != null) {
+			chaine.append("Les vendeurs qui proposent des fleurs sont :\n");
+			for (int i = 0; i < etalsAvecProduit.length; i++) {
+				chaine.append(" - " + etalsAvecProduit[i].getVendeur().getNom() + "\n");
+			}
+		}
+		return chaine.toString();
+	}
+}}
